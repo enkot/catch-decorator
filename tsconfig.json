@@ -1,0 +1,21 @@
+{
+    "compilerOptions": {
+        "target": "es6",
+        "lib": [
+            "dom",
+            "es6"
+        ],
+        "module": "es6",
+        "moduleResolution": "node",
+        "outDir": "lib",
+        "declaration": true,
+        "strict": true,
+        "noUnusedLocals": true,
+        "experimentalDecorators": true,
+        "suppressImplicitAnyIndexErrors": true
+    },
+    "include": [
+        "src/**/*.ts"
+    ],
+    "compileOnSave": false
+}
