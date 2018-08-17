@@ -8,6 +8,11 @@ export default {
         format: 'umd'
     }],
     plugins: [
+        {
+            banner() {
+                return '/** MIT licence */';
+            }
+        },
         typescript()
     ]
 }
