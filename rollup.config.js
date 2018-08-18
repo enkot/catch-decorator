@@ -1,4 +1,6 @@
+import path from 'path';
 import typescript from 'rollup-plugin-typescript2';
+import license from 'rollup-plugin-license';
 
 export default {
     input: 'src/index.ts',
@@ -8,11 +10,13 @@ export default {
         format: 'umd'
     }],
     plugins: [
-        {
-            banner() {
-                return '/** MIT licence */';
-            }
-        },
+        license({
+            sourceMap: true,
+            banner: {
+                file: path.join(__dirname, 'LICENSE'),
+                encoding: 'utf-8'
+            },
+        }),
         typescript()
     ]
 }
