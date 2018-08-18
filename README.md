@@ -1,4 +1,4 @@
-# catch-decorator
+# 🎣 catch-decorator
 [![Build Status](https://travis-ci.org/enkot/catch-decorator.svg?branch=master)](https://travis-ci.org/enkot/catch-decorator)
 
 Allows you to handle exceptions in class methods with only one annotation
