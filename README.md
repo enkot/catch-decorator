@@ -28,6 +28,8 @@ export default class Messenger {
 ```
 we can write this:
 ```js
+import { Catch } from 'catch-decorator'
+
 export default class Messenger {
     @Catch()
     async getMessages() {
