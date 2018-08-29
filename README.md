@@ -41,7 +41,7 @@ much prettier, isn't it?
 
 
 ## How to use?
-> All examples shown in case of VueJS class components. But it works with any ES6/Typescript classes. 
+> All examples shown in case of VueJS class components. But it works with any ES/Typescript classes. 
 
 For example, if you want to show toast notification on every exception, you should register your handlers first: 
 
