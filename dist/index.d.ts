@@ -1,4 +1,2 @@
-import EntityMap from './EntityMap';
-declare const handlerStore: EntityMap;
-export declare const Catch: (catchArg?: any) => any;
-export default handlerStore;
+declare const _default: (errorClass: any, handler: (error: any, ctx: any) => void) => any;
+export default _default;
