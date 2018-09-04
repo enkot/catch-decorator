@@ -1,13 +1,11 @@
 {
   "name": "catch-decorator",
-  "version": "1.0.3",
+  "version": "2.0.0",
   "description": "Let you handle exceptions with just one annotation",
   "main": "dist/index.js",
   "typings": "dist/index.d.ts",
   "scripts": {
     "build": "rollup --config",
-    "example": "npm run build && webpack --config example/webpack.config.js",
-    "dev": "webpack --config example/webpack.config.js",
     "test": "npm run build && jest"
   },
   "repository": {
@@ -16,7 +14,10 @@
   },
   "keywords": [
     "catch",
-    "decorator"
+    "decorator",
+    "javascript",
+    "errors",
+    "handling"
   ],
   "author": "Enkot",
   "license": "MIT",
@@ -32,12 +33,6 @@
     "rollup-plugin-typescript2": "^0.14.0",
     "ts-jest": "^22.4.6",
     "ts-loader": "^2.0.3",
-    "typescript": "^2.7.2",
-    "uglify-es": "^3.3.9",
-    "webpack": "^2.5.0"
-  },
-  "dependencies": {
-    "vue": "^2.5.17",
-    "vue-class-component": "^6.2.0"
+    "typescript": "^2.7.2"
   }
 }

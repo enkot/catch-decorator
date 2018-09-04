@@ -4,6 +4,8 @@
 Allows you to handle exceptions in class methods with only one annotation
  (decorator). Idea of errors handling taken from Java.
 
+ > *UPDATE* from v2: refactored to use stacked decorators style. Thx to @k1r0s :)  
+
 ## Install
 
 ```bash
@@ -16,11 +18,11 @@ But if we use classes, for example for Vue components, why can't we use method d
 
 So, for example, instead of this:
 ```js
-export default class Messenger {
+class Messenger {
     async getMessages() {
         try
-            await api.getData() // <-- can throw error
-        } catch(e) {
+            await api.getData() // <-- can throw ServerError
+        } catch(err) {
             ...
         }   
     }
@@ -28,12 +30,12 @@ export default class Messenger {
 ```
 we can write this:
 ```js
-import { Catch } from 'catch-decorator'
+import Catch from 'catch-decorator'
 
-export default class Messenger {
-    @Catch()
+class Messenger {
+    @Catch(ServerError, handler)
     async getMessages() {
-        await api.getData() // <-- can throw error
+        await api.getData() // <-- can throw custom ServerError
     }
 }
 ```
@@ -41,70 +43,46 @@ much prettier, isn't it?
 
 
 ## How to use?
-> All examples shown in case of VueJS class components. But it works with any ES/Typescript classes. 
+> `catch-decorator` works with any ECMAScript/Typescript classes. If you use Babel, [babel-plugin-transform-decorators-legacy](https://github.com/loganfsmyth/babel-plugin-transform-decorators-legacy) is needed. If you use TypeScript, enable `--experimentalDecorators` flag.
 
-For example, if you want to show toast notification on every exception, you should register your handlers first: 
+You can handle any thrown error:
 
 ```js
-// main.ts
-import catchDecorator from 'catch-decorator'
-import { ServerError } from './errors' // custom error
+import Catch from 'catch-decorator'
 
-catchDecorator.set(Error, (e: any) => Toast.error(e.message))
-catchDecorator.set(ServerError, (e: any) => Toast.error('Server error!'))
-```
-and then in class/component:
-```js
-@Component
-export default class Messenger extends Vue {
-    @Catch()
-    async getMessages() {
-        const data = await api.getData() // <-- can throw Error
-        ...
-    }
-}
-```
-In this case catch-decorator will use globaly registered handlers.
+const CatchAll = Catch(Error, (err: any) => console.log(err.message))
 
-You can also specify exact errors to handle:
-```js
-@Component
-export default class Messenger extends Vue {
-    @Catch([Error, ServerError])
-    async getMessages() {
-        const data = await api.getData() // <-- can throw ServerError
+class Messenger {
+    @CatchAll
+    getMessages() {
+        throw new TypeError('ReferenceError here!')
         ...
     }
 }
 ```
 
-As option, you can pass callback. In this case current object (context) will be passed as second argument.
+or write decorators in stack to handle more than one errors type. In callback as second argument will be passed current instance object (context):
 ```js
-@Component
-export default class Messenger extends Vue {
-    errorMessage = ''
-
-    @Catch((err, ctx) => ctx.errorMessage = err.message)
-    async getMessages() {
-        const data = await api.getData()
+class Messenger {
+    @Catch(TypeError, (err, ctx) => {...})
+    @Catch(ReferenceError, (err, ctx) => {...})
+    getMessages() {
+        throw new ReferenceError('ReferenceError here!')
         ...
     }
 }
 ```
-or class method name, which will be used as handler:
+
+It also works with async methods:
 ```js
-@Component
-export default class Messenger extends Vue {
-    errorMessage = ''
+class Messenger {
+    errorMessage = null
 
-    @Catch('handleError')
-    async getMessages() {
-        const data = await api.getData()
-        ...
-    }
-
-    handleError(err) {
-        this.errorMessage = err.message
+    @Catch(ServerError, (err, ctx) => ctx.errorMessage = err.message)
+    getMessages() {
+        return fetch(myRequest).then(response => { // can throw ServerError
+            ...
+        })
     }
 }
 ```
