@@ -1,84 +1,53 @@
-import { ErrorObject } from './definitions'
-import EntityMap from './EntityMap'
+type HandlerFunction = (error: any, ctx: any) => void;
 
-const LIB_NAME = 'Catch Decorator'
-
-// store all global error handlers here
-const handlerStore: EntityMap = new EntityMap()
-
-function log(message: string, errorObject: any) {
-    /* tslint:disable */
-    console.warn(`${LIB_NAME}: ${message}`)
-    console.error(errorObject)
-    /* tslint:enable */
-}
-
-// run handler if it exists
-// and error class equals error constructor
-function runHandler(
-    ctx: any,
-    methodName: string,
-    errorObject: ErrorObject<any>,
-    errorClass: any = errorObject.constructor,
-): void {
-    let handler = null
-
-    if (errorObject.constructor === errorClass) {
-        // get handler mapped to passed error class
-        handler = handlerStore.get(errorClass)
-    }
-
-    if (handler && typeof handler === 'function') {
-        handler(errorObject, ctx)
+function handleError(
+    ctx: any, 
+    errorClass: any, 
+    handler: HandlerFunction, 
+    error: any
+) {
+    // check if error is instance of passed error class
+    if (typeof handler === 'function' && error instanceof errorClass) {
+        // run handler with error object 
+        // and class context as second argument
+        handler.call(null, error, ctx)
     } else {
-        log(`Unhandled exception in ${methodName} method`, errorObject)
+        // throw error further,
+        // next decorator in chain can catch it
+        throw error
     }
 }
 
-// wrap method with decorator function,
-// and run original method wrapped with try/catch block
-export const Catch = (catchArg?: any): any => {
+// decorator factory function
+export default (errorClass: any, handler: HandlerFunction): any => {
     return (
         target: any,
         propertyKey: string,
-        descriptor: TypedPropertyDescriptor<any>,
+        descriptor: PropertyDescriptor,
     ) => {
         // save a reference to the original method
         const originalMethod = descriptor.value
 
-        descriptor.value = async function(...args: any[]) {
+        // rewrite original method with custom wrapper
+        descriptor.value = function(...args: any[]) {
             try {
-                return await originalMethod.apply(this, args)
-            } catch (error) {
-                if (!catchArg) {
-                    // automatically runs registered handler for thrown exception
-                    return runHandler(this, propertyKey, error)
-                }
-
-                if (typeof catchArg === 'function') {
-                    // run callback function if it passed
-                    catchArg.call(this, error, this)
-                } else if (typeof catchArg === 'string') {
-                    const classMethod = target[catchArg]
-
-                    if (!classMethod) {
-                        return console.warn(`There is no class method with name "${catchArg}"`)
-                    }
-
-                    // run class method if it name passed
-                    classMethod.call(this, error)
-                } else if (catchArg.length) {
-                    // else run handlers for passed error classes
-                    catchArg.forEach((value: any) => {
-                        runHandler(this, propertyKey, error, value)
+                const result = originalMethod.apply(this, args)
+                
+                // check if method is asynchronous
+                if (result && typeof result.then === 'function' && typeof result.catch === 'function') {
+                    // return promise
+                    return result.catch((error: any) => {
+                        handleError(this, errorClass, handler, error)
                     })
                 }
+
+                // return actual result
+                return result
+            } catch (error) {
+               handleError(this, errorClass, handler, error)
             }
         }
 
         return descriptor
     }
 }
-
-// map error classes to handlers
-export default handlerStore
