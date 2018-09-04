@@ -4,7 +4,7 @@
 Allows you to handle exceptions in class methods with only one annotation
  (decorator). Idea of errors handling taken from Java.
 
- > *UPDATE* from v2: refactored to use stacked decorators style. Thx to @k1r0s :)  
+ > *UPDATE* from v2: refactored to use stacked decorators style. Thx [@k1r0s](https://github.com/k1r0s) for idea :)  
 
 ## Install
 
