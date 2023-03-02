@@ -29,7 +29,7 @@
     "@types/jest": "^22.2.3",
     "jest": "^23.0.1",
     "rollup": "^0.59.3",
-    "rollup-plugin-license": "^0.7.0",
+    "rollup-plugin-license": "^3.0.1",
     "rollup-plugin-typescript2": "^0.14.0",
     "ts-jest": "^22.4.6",
     "ts-loader": "^2.0.3",
